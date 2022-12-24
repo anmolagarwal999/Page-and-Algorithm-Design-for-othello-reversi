@@ -656,15 +656,14 @@ The Jaccard Value can be calculated using: **UnionCnt** and **IntersectCnt.**
   
 
 
-|                                                                                                                                                                                                                                                                                                                                                              |
+||
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 
 Example: Board 1 ( P ) <br/>![](https://i.imgur.com/2qeS11n.png)
 <br/>
 Board 2 (Q) <br/>![](https://i.imgur.com/UKaXv6d.png)
 <br/>
-In the above example, as shown with the matching colours, these match:</br>- Row 6 in Board 1 with Row 4 in Board 2 </br>- Column 2 in Board 1 with Column 4 in Board 2 </br>- Column 11 in Board 1 with Column 5 in Board 2 </br>- All empty rows/columns</br>Jaccard_Rows = 2/12 = 1/6</br>Jaccard_Cols = 3/19</br>BaseExactSim = 1/6 + 3/19 = 0.32456 
-|
+In the above example, as shown with the matching colours, these match:</br>- Row 6 in Board 1 with Row 4 in Board 2 </br>- Column 2 in Board 1 with Column 4 in Board 2 </br>- Column 11 in Board 1 with Column 5 in Board 2 </br>- All empty rows/columns</br>Jaccard_Rows = 2/12 = 1/6</br>Jaccard_Cols = 3/19</br>BaseExactSim = 1/6 + 3/19 = 0.32456|
 
   
 
