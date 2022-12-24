@@ -1,0 +1,41 @@
+.grid {
+  display: grid;
+  width: min-content;
+  margin: 0 auto;
+  /* grid-template-rows: repeat(3, 4.5rem);
+    grid-template-columns: repeat(3, 4.5rem); */
+  justify-content: center;
+  gap: 2px;
+  /* background-color: black;
+    border: 2px solid black; */
+}
+
+.box,
+.label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 30px;
+}
+
+.box {
+  background-color: green;
+  /* border: 1px solid red; */
+  width: 100px;
+  height: 100px;
+}
+
+.circle {
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+}
+
+.white .circle {
+  background-color: white;
+}
+
+.black .circle {
+  background-color: black;
+}

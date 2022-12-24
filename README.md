@@ -1,7 +1,8 @@
 ## Page Design for storing Played Games for Reversi/Othello with efficient navigation queries
 
-- Anmol Agarwal (2019101068), Sanchit Arora (2019101047)
+* By Anmol Agarwal (@anmolagarwal999), Sanchit Arora (@tichnas)
 
+Please find the more readable version of this README [here](./REPORT.pdf) .
 ### Aim:
 * Design the page layout to store the board position of the game under the constraint that it should be possible to efficiently replay the complete game, or check what the board position at some move is.
 * Augmenting the page design to perform `what if` analysis when different moves are made at the current state of the game. This includes: Finding the K nearest board configurations from the past history of the game and then using these retrieved neighbours for calculate the goodness of specific moves heuristically.
@@ -14,9 +15,7 @@
 - **A1:** Different sources mention different criteria for ending of the game when a player cannot move. Some sources say that the game ends when either player cannot move. Others say that the game ends only when BOTH players are not able to move.
 
   - We assume: GAME ENDS when even one player does not have a move left.
-
 - **A2:** The disks on the board make **ONE SINGLE connected component** (where valid moves are horizontal, vertical and diagonal). This is easy to see as a disk can be added only when at least one of the opponent’s disks swaps its color.
-
 - **A3:** In each move, exactly one disk is added to the board i.e. the number of disks on the board is the same as the number of moves done on the board so far.
 
 #### Some terminology/notation:
@@ -25,8 +24,8 @@
 - For ease of reference, without loss of generality, we consider the initial configuration of the board played i.e. having 4 disks as the first four moves. Hence, MAX MOVES in our case: N x N (since we are considering the initial configuration of the game to consume 4 moves)
 - **G**: game ID
 - **TotMoves:** total number of moves played in the game.
-- **M****<sub>i</sub>**: ith move of the game where 1&lt;=i&lt;=TotMoves. (NOTE: M1, M2, M3 and M4 are fixed since they correspond to the initial configuration of the game)
-- **S****<sub>i</sub>** = state of the board after Move “i”
+- **M**<sub>i</sub>: ith move of the game where 1&lt;=i&lt;=TotMoves. (NOTE: M1, M2, M3 and M4 are fixed since they correspond to the initial configuration of the game)
+- **S**<sub>i</sub> = state of the board after Move “i”
 
 
 #### Queries we are prioritizing:
@@ -76,8 +75,6 @@ While brainstorming, in our shortlisted page designs, we often found a tradeoff 
 
   - If the user is currently at state “i”, these pages are used to store state “i” of the game.
   - When the user moves to state “i+1” from state “i”, then updates are made within these pages themselves.
-  - ****
-
 
 ### Making navigation queries efficient by using SQUARE-root decomposition type logicProposal:
 
@@ -124,18 +121,19 @@ Then we will be taking a snapshot after every K moves where K = sqrt(TotMoves).
   -  In the worst case, diff can be nearly N^2 and hence, we might end up making (N x sqrt(TotMoves)) operations where TotMoves can be atmax N^2 and so, in worst case, we would end up making **N^2 operations** which is an improvement by a factor of “N” (ie an improvement by a factor of 1000 potentially for large board sized games).
 
 
-#### Page Design 1 (Storage based Page)
+### Page Design 1 (Storage based Page)
 
 We propose to use this page design for storing the checkpoints of the board state every sqrt(TotMoves) moves as described above. These pages will only be READ-ONLY in nature.
 
 **We will be covering this section with the help of an example:**
 
 Consider that we need to store the following state of the 12 x 12 board:
+<p align="center">
+<img src="https://lh6.googleusercontent.com/q0h8-9xhLMUxuCDsjfnESlOLLotT5vk48bjLqJTFhhfpKUbRQuPebiVi7RvClPPs0PeJ_22WywHO1EnbWoWr_IXdA1A79jGfPuWkVuRL2VapRxfVlRlh_WHYZGoHcTKB8svpOgJ2aF5biNMkd8EGeZRBcKh3qdqxkVzdX5zGF76YaT8sdP6FT5CD8CglAw" width="400" height="400" />
+</p>
 
-![](https://lh6.googleusercontent.com/q0h8-9xhLMUxuCDsjfnESlOLLotT5vk48bjLqJTFhhfpKUbRQuPebiVi7RvClPPs0PeJ_22WywHO1EnbWoWr_IXdA1A79jGfPuWkVuRL2VapRxfVlRlh_WHYZGoHcTKB8svpOgJ2aF5biNMkd8EGeZRBcKh3qdqxkVzdX5zGF76YaT8sdP6FT5CD8CglAw)
 
-
-###### Feature 1: Truncating the board to store only the smallest rectangle which covers the entire connected component
+#### Feature 1: Truncating the board to store only the smallest rectangle which covers the entire connected component
 
 First we make the following claims:
 
@@ -151,7 +149,10 @@ As a result, let’s say that **M** moves have been done. This means that **M** 
 
 In the above example, 
 
-![](https://lh4.googleusercontent.com/Q7WI1pVTnjHpooS5ZqIUWjBpmrVtjX9zAdaBxtXn9p8lzzeSrUAZ8HFl4VT-Cbzu1LMzRz0n7rRjM71DH_Cri2CAoZlCBi7AykX9WI-5V5G-8pTLMLyeOSGMNqNpgwsStfk_2PIT3UKBnG-7GTzoNMh6vxASgg63spdxuYwiiSDEv6NuX2KfC1thrDwbPg)
+<p align="center">
+<img src="https://lh4.googleusercontent.com/Q7WI1pVTnjHpooS5ZqIUWjBpmrVtjX9zAdaBxtXn9p8lzzeSrUAZ8HFl4VT-Cbzu1LMzRz0n7rRjM71DH_Cri2CAoZlCBi7AykX9WI-5V5G-8pTLMLyeOSGMNqNpgwsStfk_2PIT3UKBnG-7GTzoNMh6vxASgg63spdxuYwiiSDEv6NuX2KfC1thrDwbPg" width="400" height="400" />
+</p>
+
 
 In the above figure, we see the connected component “C” is enclosed within the **RED** polygon and the smallest rectangle which covers the connected component “C” is enclosed in **GREEN**. 
 
@@ -161,15 +162,15 @@ The Bottom right corner of the rectangle is at cell (9,11).
 
 In order to represent this configuration, 
 
-we would be storing H x W cells (more details on the way these cells are stored mentioned later in the doc). Since **W+H&lt;=M**, by AM-GM inequality, we can say that **H x W &lt;= M****<sup>2</sup>****/4**
+we would be storing H x W cells (more details on the way these cells are stored mentioned later in the doc). Since **W+H&lt;=M**, by AM-GM inequality, we can say that **H x W &lt;= M<sup>2</sup>/4**
 
-**_Proposal_****_:_**
+**_Proposal_**:
 
 Instead of trying to capture the entire board, we can try to capture only the smallest enclosing rectangle. For storing a particular state of the game, we can **store the coordinates of the top-left and bottom-right corner of the rectangle** along with the state of the rectangle (which is empirically MUCH SMALLER as compared to the entire board in the INITIAL AND MIDDLE PART OF THE GAME)
 
 **Why would this save a lot of space ?**
 
-For perspective, for a **1000 x 1000 board** with 1,000,000 cells, 
+For perspective, for a **$1000 \times 1000$ board** with 1,000,000 cells, 
 
 |                |                                                                                                  |                                          |
 | -------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------- |
@@ -186,7 +187,7 @@ For perspective, for a **1000 x 1000 board** with 1,000,000 cells, 
   
 
 
-**Feature 2: Encoding rows**
+#### Feature 2: Encoding rows
 
 Now, let us store the board row-wise ie calculate an encoding for each row.
 
@@ -227,7 +228,7 @@ Whenever 2 alphabets are encountered consecutively, we can interpret the frequen
 
 State of the board
 
-![](https://lh4.googleusercontent.com/Q7WI1pVTnjHpooS5ZqIUWjBpmrVtjX9zAdaBxtXn9p8lzzeSrUAZ8HFl4VT-Cbzu1LMzRz0n7rRjM71DH_Cri2CAoZlCBi7AykX9WI-5V5G-8pTLMLyeOSGMNqNpgwsStfk_2PIT3UKBnG-7GTzoNMh6vxASgg63spdxuYwiiSDEv6NuX2KfC1thrDwbPg)
+<img src="https://lh4.googleusercontent.com/Q7WI1pVTnjHpooS5ZqIUWjBpmrVtjX9zAdaBxtXn9p8lzzeSrUAZ8HFl4VT-Cbzu1LMzRz0n7rRjM71DH_Cri2CAoZlCBi7AykX9WI-5V5G-8pTLMLyeOSGMNqNpgwsStfk_2PIT3UKBnG-7GTzoNMh6vxASgg63spdxuYwiiSDEv6NuX2KfC1thrDwbPg" width="400" height="400" />
 
 Encoding of the different rows:
 
@@ -274,12 +275,12 @@ For ease of reading above, every alternate row’s encoding has been bolded. Als
 
 3B6WB**E3WE3BWB**E8BE**E5BE2BE**EBW3B3WE**2E2BEB3WE**
 
-**NOTE: **That this design can be inconvenient to visualize/make updates on. That is why we use it only for storage.
+**NOTE:** That this design can be inconvenient to visualize/make updates on. That is why we use it only for storage.
 
 * * *
 
 
-#### Page Design 2 (Update based Page)
+### Page Design 2 (Update based Page)
 
 **It is not easy to make updates based on moves in the design used in page design 1**. Hence, we switch to a different page design on which updates will be much easier. 
 
@@ -315,26 +316,28 @@ We’ll simply store EBBBWWWWWWBE, **without any optimized encoding** (as oppose
 Now, since the whole board can’t be stored in a single page, we need a way to break them. And, there are mainly two ways to do so:
 
 Let us consider the following **8 x 8** example (and a page size of **9 bytes**) to demonstrate the design:
+<p align="center">
+<img src="https://lh4.googleusercontent.com/VKaCFYM9GPZ_8-aEmNHYCugtkaey3RQJpCR5bTVAUahSfavKsRsFcuzNcfwCVW2IGwO6HWAz9ZhvnMd3ZoOxRthkcgjyUujRIpe9fbIKxjg1M-IPI04MoXJu-B5dRe7dD7m4xOdINcKtzqPSIj7f7LK14m7skhaFFXnbTl9FuKVV96--TLDN2tAoB-Jebw" width="400" height="400" />
+</p>
 
-![](https://lh4.googleusercontent.com/VKaCFYM9GPZ_8-aEmNHYCugtkaey3RQJpCR5bTVAUahSfavKsRsFcuzNcfwCVW2IGwO6HWAz9ZhvnMd3ZoOxRthkcgjyUujRIpe9fbIKxjg1M-IPI04MoXJu-B5dRe7dD7m4xOdINcKtzqPSIj7f7LK14m7skhaFFXnbTl9FuKVV96--TLDN2tAoB-Jebw)
 
-
-##### Proposed update-based page design 1:
+#### Proposed update-based page design 1:
 
 Flatten the 2D board into a 1D board and store a character “E”,”W” and “B” depending on the state of the cell. Each character occupies one byte. So, if a page can store “T” bytes, then ceil(N<sup>2</sup>/T) pages will be needed.
 
 **String S which can be stored across pages is (alternate rows have been bolded for convenience)**: 
 
-**EEEWEEEE**EWWWEEEE**EE****WWEEEE**EEWWWWEE**EEBB****WBEE**EEBWWEEE**EBEEEE****EE**EEEEEEEE
+**EEEWEEEE**EWWWEEEE**EE**WWEEEE**EEWWWWEE**EEBB**WBEE**EEBWWEEE**EBEEEE**EE**EEEEEEEE**
 
 In the above example, different colors represent the contents of different pages assuming a page size of 9 bytes.
 
 
-##### Proposed update-based page design 2 (much improved):
+#### Proposed update-based page design 2 (much improved):
 
 Store a sub-grid in each page. So if, let’s say, the page size allows us to store _p_ elements, we’ll store a grid of _√p X √p_ in each page. Since we have assumed page size to be 9 bytes, p =3 for our example.
-
-![](https://lh3.googleusercontent.com/dv-i2hvF8DpXftUMwpqDaorX9ROuxFbV6zMOPC7V8ae3ZijbWi4v_-2kBt1pqwbKm9trRVWDS5jEtprPwm_xvDfaUibqhr37-yLSdU5FzzpbrORARsLZCkaFTjTs9wrid_tqgkZ5hVU0OD5RS5CnoLNieFLNghm9OXh5GSTQaBjFB-OwRYlQpbT5bfJPqw)
+<p align="center">
+<img src="https://lh3.googleusercontent.com/dv-i2hvF8DpXftUMwpqDaorX9ROuxFbV6zMOPC7V8ae3ZijbWi4v_-2kBt1pqwbKm9trRVWDS5jEtprPwm_xvDfaUibqhr37-yLSdU5FzzpbrORARsLZCkaFTjTs9wrid_tqgkZ5hVU0OD5RS5CnoLNieFLNghm9OXh5GSTQaBjFB-OwRYlQpbT5bfJPqw" width="600" height="600" />
+</p>
 
 NOTE: Since all elements are fixed length (1 bytes), knowing what page and offset a particular cell is present in is straightforward. 
 
@@ -352,7 +355,7 @@ NOTE: Since all elements are fixed length (1 bytes), knowing what page and offse
 
 Without much increase in the time or implementation complexity of the state update, we can decrease the storage space required. We notice that we are dealing with **only 3 unique characters**: B, W and E. We can encode 3 unique characters with just 2 bits.
 
-So, instead of using an entire character (1 byte)  for each state, we can represent them using 2 bits **(****4 fold reduction in space****). **See the below table for more details:
+So, instead of using an entire character (1 byte)  for each state, we can represent them using 2 bits **(4 fold reduction in space**). **See the below table for more details:
 
 |            |                                     |                                          |
 | ---------- | ----------------------------------- | ---------------------------------------- |
@@ -366,7 +369,7 @@ This data can simply be treated as bit stream, which can then be encoded into by
 
 ### Storing the moves of each game in a new relation
 
-Let each game have a GAME ID which is **incremental **in nature. For resolving the state of the board between checkpoints (intermediate states), all moves of the game need to be stored. For this, we maintain a separate table with this page design as explained in “proposed approach”:** Since the player turns are alternative, we need not store the player ID of the player who made the move (**an even move is always by player 1 and odd move is always by player 2**).**
+Let each game have a GAME ID which is **incremental in nature. For resolving the state of the board between checkpoints (intermediate states), all moves of the game need to be stored. For this, we maintain a separate table with this page design as explained in “proposed approach”:** Since the player turns are alternative, we need not store the player ID of the player who made the move (**an even move is always by player 1 and odd move is always by player 2**).**
 
 **Proposed Approach**
 
@@ -453,7 +456,7 @@ I have given stepwise memory consumed by the different steps of the pipeline in 
 
 Basically, since we are storing the smallest sized rectangle for the checkpoints. We are storing k = √TotMoves ~ N checkpoints and each checkpoint would occupy atmax N<sup>2</sup><sub> </sub>bytes (one for each cell of the board) at worst (I have provided a better bound using AM-GM equality in the detailed section).
 
-**The worst memory needed here: N****<sup>3</sup>**** approx**
+**The worst memory needed here: N**<sup>3</sup> **approx**
 
 Usually, much less memory would be needed here due to the compression of neighboring cells in the same row.
 
@@ -467,9 +470,9 @@ Let a page be capable of storing “p” bytes. Then, it can store √p elements
 
 Therefore, memory needed would be: 
 
-**\[ceil(N/√p)]****<sup>2 </sup>****x p **
+**\[ceil(N/√p)]**<sup>2 </sup>$\times$ p
 
-**Total memory = **sum of all the above terms
+**Total memory =** sum of all the above terms
 
 
 ### Summarizing, 
@@ -481,7 +484,7 @@ Therefore, memory needed would be: 
 - The usage of page design (#2) for updates makes updates extremely quick. Storing the square submatrices in each page instead of flattening the board grid helps us take advantage of locality of reference during disk-page accesses for all 3 types of updates: row-based, column-based and diagonal based updates. This is especially helpful for Reversi where all updates are on contiguous neighboring cells possible across all 6 directions.
 - Using Huffman encoding based compression for WHITE, BLACK and EMPTY helps us reduce our storage for the state of each board cell by 4 times (from 1 byte to 2 bits).
 
-## Page & Algorithm Design for Query Execution for assisting Reversi/Othello players**
+## Page & Algorithm Design for Query Execution for assisting Reversi/Othello players
 
 
 **Some terminology/notation:**
@@ -490,8 +493,8 @@ Therefore, memory needed would be: 
 - For ease of reference, without loss of generality, we consider the initial configuration of the board played i.e. having 4 disks as the first four moves. Hence, MAX MOVES in our case: N x N (since we are considering the initial configuration of the game to consume 4 moves)
 - **G**: game ID
 - **TotMoves:** total number of moves played in the game.
-- **M****<sub>i</sub>**: ith move of the game where 1&lt;=i&lt;=TotMoves. (NOTE: M1, M2, M3 and M4 are fixed since they correspond to the initial configuration of the game)
-- **S****<sub>i</sub>** = state of the board after Move “i”
+- **M**<sub>i</sub>: ith move of the game where 1&lt;=i&lt;=TotMoves. (NOTE: M1, M2, M3 and M4 are fixed since they correspond to the initial configuration of the game)
+- **S**<sub>i</sub> = state of the board after Move “i”
 - **TotGames**: Total number of games in the database so far
 - K = Number of nearest neighbours to be considered (Let k&lt;=50)
 - Intermediate_K: number of nearest neighbours retained in the pruning step: (let Intermediate_K be of the order &lt;= 500)
@@ -499,15 +502,15 @@ Therefore, memory needed would be: 
   
 
 
-### Approach to finding K nearest Neighbours and revised page design:**
+### Approach to finding K nearest Neighbours and revised page design:
 
 **Part 0: Defining a subproblem whose solution helps us solve the later part of the assignment**
 
 First, we will describe a new unrelated subproblem and then, we will use subproblem in our method to find the K nearest neighbours.
 
-**Subproblem: **Let V = {V<sub>1</sub>, …, V<sub>t </sub>} be a set of “t” vectors, each having “d” dimensions. We need to find the “S'' approximate nearest neighbours to a new query vector V<sub>query</sub> .
+**Subproblem:** Let V = {V<sub>1</sub>, …, V<sub>t </sub>} be a set of “t” vectors, each having “d” dimensions. We need to find the “S'' approximate nearest neighbours to a new query vector V<sub>query</sub> .
 
-**Approach: **
+**Approach:**
 
 Inspired by [FAISS](https://ai.facebook.com/tools/faiss/) and [Voronoi Tessellation](http://philogb.github.io/blog/2010/02/12/voronoi-tessellation/?utm_source=feedburner), we solve this problem in the following way:
 
@@ -538,13 +541,9 @@ NOTE: if we wish to add newly played games to this index, we can **lazily** upda
   
 
 
-**Query answering Time complexity : **
+**Query answering Time complexity :**
 
 O(_dimensions in each vector_ X _number of clusters_ ) +  O(_dimensions in each vector_ X _number of vectors in selected cluster_ ) + O(Number of block accesses in the secondary index)
-
-* * *
-
-* * *
 
 * * *
 
@@ -553,26 +552,33 @@ O(_dimensions in each vector_ X _number of clusters_ ) +  O(_dimensions in each
 
 The metric should show high similarity for S<sub>G, i</sub> with S<sub>G, i</sub> itself but also with the below versions of S<sub>G, i</sub> after rotation, flipping, colour inversion etc as can be seen below.
 
+
+The metric should show high similarity for S<sub>G, i</sub> with S<sub>G, i</sub> itself but also with the below versions of S<sub>G, i</sub> after rotation, flipping, colour inversion etc as can be seen below.
+
+
 |                             |                                                                      |                                                                                                                                                                                                                                           |
 | --------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Operation performed**     | **Notation to depict the board state after the performed operation** | **Board state  after operation performed**                                                                                                                                                                                                |
-| Original Board              | S<sub>G, i</sub>                                                     | **![](https://lh5.googleusercontent.com/MWWyMx0tg1O3sj21aJztoxlOzOxc___sVHLtOBz-0ioOqF24V5uDLdIQlxtirpAAGwE1zH4hBm3V7Wp7HrjpT9msomXlJp6AOniYleLryqbmNrxB1CFDM_9J2uwnvlFuVGZTO7d73WuEAc72R1sg0FiI1ZJZ9llbzERIVb-4Z7v2PZUykNmmAnZA6oiUcA)** |
-| Rotation by 90 degrees      | S<sup>90</sup><sub>G, i</sub>                                        | ![](https://lh6.googleusercontent.com/jJXabfb_-xwciEVocWYudqCqKkawcCkrfWB0nOPRkak42gwsiQLW3ozU12REkU6h4Aud_mghbxJW4CF7NTg8FOJlSf1xLS3znTRw37WSc_pTN2kAfPzaJyPbJaCyU0HUsaphq9UnOe2-CCCEZApwFtsgAPXuHM1_qpqli6GcK1UvpBtAFlT0OKBQJnE6fg)     |
-| Rotation by 180 degrees     | S<sup>180</sup><sub>G, i</sub>                                       | ![](https://lh5.googleusercontent.com/sgID7V4a53t5TGWdBj04dSxxP0HCkla0kELgX2WTvb-O4UQ9_rHcltAvVJAesIY_8wQp5coaRe7R7LbfRon43d9RiMOSH4cCo_ifOzW_5MZEYgzkpvOBq-_ehXcq3zzfCvsk3u_1fHh572x7lRm6R1cOqgKOHjXjzyZ0QEOcMtPqPhkFhvCINkedPhC3Cw)     |
-| Rotation by 270 degrees     | S<sup>270</sup><sub>G, i</sub>                                       | ![](https://lh4.googleusercontent.com/PegLH0s6EoUgrecTFhI5hUZinLif9wBRKkkOqqEf4sG18RT_jvOtF_d_A_hjB8ZfLV8fZVvWDrvHzAUL3FRogGYV0AZLTsk7oPfdc6RmnYsvZZdfZDYJrzcxkSzl6y2R3qPLLi_QtflTD0pxY7NmGKHQmqL5Cf8t8I3WPJdKr4T6qmi59bPSeLqibRu_XQ)     |
-| Horizontally flipped        | S<sup>H</sup><sub>G, i</sub>                                         |                                                                                                                                                                                                                                           |
-| Vertically flipped          | S<sup>V</sup><sub>G, i</sub>                                         |                                                                                                                                                                                                                                           |
-| Flipped across diagonal 1   | S<sup>D1</sup><sub>G, i</sub>                                        | ![](https://lh6.googleusercontent.com/qf0ZfqBIZwdyvC8XS6nHFRIvUyy3LrpSJyeU7zCa4V5zqzYy-_OF5qe2fffQvLWJU3WZVxRme0O3HnMLkvXlkxK_ixgV4cMaTN2WEd65lhxyMBz0SGFmbIzq8A-JdjGiJr2pZTSamkNzS3iQ037fp5VGLnBSDsyeDDDFvfKDiytTgtOZKQ8mHMaovzROMw)     |
-| Flipped across diagonal 2   | S<sup>D2</sup><sub>G, i</sub>                                        | ![](https://lh3.googleusercontent.com/qPxaW8wXWLN4_kPjUe2nDofsrj9-3PKwlRh-BVe7mzsyUMQT8osCH6Sn-5JpfYN_xFC-Yo_PWoVwrwkd-8sj3QHfDWYOslOpnEHxWJmJpMBYsMMlekM3dCxwwswuGawzvECjIPMxIkL3Awg2_iEHggXsCVxXeXeyxhTBqMTyJn-sgLX3mFPzPg6F2coVpQ)     |
-| Each cell’s colour inverted | S<sup>#</sup><sub>G, i</sub>                                         | ![](https://lh4.googleusercontent.com/DW0PHv6NPtMCLBNrLY573Jap-jVfBMgMX-LHW9qz1Ozs8MeY3C65BVMvKnDm0zIv4J403Wrrk9iw5HD8_foFsrk5MqCbj8u1Zm2cUvdT5s_oHi94FdorbTa1tU9q-4cqxogLk_JuvWRoLHfAc9KtbOOrCeNKEY_PggAeIO5ixBa2bkqWgRjUY0WkNr15Eg)     |
-
-* * *
+| Original Board              | S<sub>G, i</sub>                                                     | **<img src="https://lh5.googleusercontent.com/MWWyMx0tg1O3sj21aJztoxlOzOxc___sVHLtOBz-0ioOqF24V5uDLdIQlxtirpAAGwE1zH4hBm3V7Wp7HrjpT9msomXlJp6AOniYleLryqbmNrxB1CFDM_9J2uwnvlFuVGZTO7d73WuEAc72R1sg0FiI1ZJZ9llbzERIVb-4Z7v2PZUykNmmAnZA6oiUcA" width="200" height="200"/>** |
+| Rotation by 90 degrees      | S<sup>90</sup><sub>G, i</sub>                                        |   <img src="https://i.imgur.com/fuB5pF8.png" width="200" height="200"/>
+   |
+| Rotation by 180 degrees     | S<sup>180</sup><sub>G, i</sub>                                       |  <img src="https://i.imgur.com/fA2Vot6.png" width="200" height="200"/>
+   |
+| Rotation by 270 degrees     | S<sup>270</sup><sub>G, i</sub>                                       |  <img src="https://i.imgur.com/gIv4hEr.png" width="200" height="200"/>
+   |
+| Horizontally flipped        | S<sup>H</sup><sub>G, i</sub>                                         |  <img src="https://i.imgur.com/2i1AIKI.png" width="200" height="200"/>
+ |
+| Vertically flipped          | S<sup>V</sup><sub>G, i</sub>                                         |  <img src="https://i.imgur.com/ldMp6E4.png" width="200" height="200"/>
+  |
+| Flipped across diagonal 1   | S<sup>D1</sup><sub>G, i</sub>                                        | <img src="https://lh6.googleusercontent.com/qf0ZfqBIZwdyvC8XS6nHFRIvUyy3LrpSJyeU7zCa4V5zqzYy-_OF5qe2fffQvLWJU3WZVxRme0O3HnMLkvXlkxK_ixgV4cMaTN2WEd65lhxyMBz0SGFmbIzq8A-JdjGiJr2pZTSamkNzS3iQ037fp5VGLnBSDsyeDDDFvfKDiytTgtOZKQ8mHMaovzROMw" width="200" height="200"/>     |
+| Flipped across diagonal 2   | S<sup>D2</sup><sub>G, i</sub>                                        | <img src="https://lh3.googleusercontent.com/qPxaW8wXWLN4_kPjUe2nDofsrj9-3PKwlRh-BVe7mzsyUMQT8osCH6Sn-5JpfYN_xFC-Yo_PWoVwrwkd-8sj3QHfDWYOslOpnEHxWJmJpMBYsMMlekM3dCxwwswuGawzvECjIPMxIkL3Awg2_iEHggXsCVxXeXeyxhTBqMTyJn-sgLX3mFPzPg6F2coVpQ" width="200" height="200"/>     |
+| Each cell’s colour inverted | S<sup>#</sup><sub>G, i</sub>                                         | <img src="https://lh4.googleusercontent.com/DW0PHv6NPtMCLBNrLY573Jap-jVfBMgMX-LHW9qz1Ozs8MeY3C65BVMvKnDm0zIv4J403Wrrk9iw5HD8_foFsrk5MqCbj8u1Zm2cUvdT5s_oHi94FdorbTa1tU9q-4cqxogLk_JuvWRoLHfAc9KtbOOrCeNKEY_PggAeIO5ixBa2bkqWgRjUY0WkNr15Eg" width="200" height="200"/>     |
 
 
 #### Part 2: Candidates for base exact similarity metric between 2 given states ie board configuration: P and Q ie BaseExactSim(P, Q)
 
 
-##### Choice 1 for “Base Exact Similarity Metric”: Number of unmatching cells needed
+**Choice 1 for “Base Exact Similarity Metric”: Number of unmatching cells needed**
 
 - Given states P and Q (each with N x N elements), when using this metric, we define 
 
@@ -584,14 +590,14 @@ The metric should show high similarity for S<sub>G, i</sub> with S<sub>G, i</sub
 
   - **BaseExactSim(P, Q) :** number of cells in (i,j) where _state(i,j,P)!=state(i,j,Q)_
 
-**Time complexity**** (**Assuming that states P and Q are already in main meory**):**
+**Time complexity** (**Assuming that states P and Q are already in main meory**):
 
-- Checking each cell will require _O(1)_
-- There are total _N__<sup>2</sup>__ _cells
-- Therefore, time-complexity = _O(N__<sup>2</sup>__)_
+- Checking each cell will require $O(1)$
+- There are total $N^2$ cells
+- Therefore, time-complexity = O($N^2$)
 
 
-##### Choice 2 for “Base Exact Similarity Metric”: Jaccard based similarity
+**Choice 2 for “Base Exact Similarity Metric”: Jaccard based similarity**
 
 **Metric proposal**
 
@@ -611,13 +617,11 @@ The metric should show high similarity for S<sub>G, i</sub> with S<sub>G, i</sub
 
   - **BaseExactSim(P, Q) :** Total Jaccard Similarity = **Jaccard_Rows(P, Q) + Jaccard_Cols(P, Q)**
 
-**How can (R****<sub>P</sub>**** U R****<sub>Q</sub>**)**  and (R****<sub>P</sub>**** ∩R****<sub>Q </sub>**) **be calculated ?**
+**How can (R<sub>P</sub> U R<sub>Q</sub>)  and (R<sub>P</sub> ∩R<sub>Q </sub>) be calculated ?**
 
 - Each row is a sequence : E,W,B depending on whether the cells in the row are white, black or empty.
 
 - We can convert this string of E,W and B into a binary string using Huffman Compression. 
-
-  -
 
 |                |                                          |
 | -------------- | ---------------------------------------- |
@@ -628,13 +632,13 @@ The metric should show high similarity for S<sub>G, i</sub> with S<sub>G, i</sub
 
 **Our solution:** Now that we can represent rows as binary strings, we can calculate intersections and unions using Dynamic Hashing OR Extendible Hashing on the binary strings (Essentially, we are interested in using a Trie type data structure. But since we cannot fit a trie in memory, we use the database equivalent of tries ie Extendible Hashing based data structure. )
 
-**Calculating number of elements in **** (R****<sub>P</sub>**** U R****<sub>Q</sub>**)**:**
+**Calculating number of elements in  (R<sub>P</sub> U R<sub>Q</sub>**)**:**
 
 - First, the hash data structure is empty.
 - Iterate through all rows of R<sub>P</sub> and insert into the data structure if the row already does not exist. If the row already does not exist, insert UnionCnt by 1.
 - Iterate through all rows of R<sub>Q</sub> and insert into the data structure if rows already does not exist. If the row already does not exist, insert UnionCnt by 1.
 
-**Calculating number of elements in **** (R****<sub>P</sub>****  ∩ R****<sub>Q</sub>**)**:**
+**Calculating number of elements in  (R<sub>P</sub>  ∩ R<sub>Q</sub>**)**:**
 
 - First, create 2 extendible hash data structures (H1 and H2) is empty.
 
@@ -654,7 +658,13 @@ The Jaccard Value can be calculated using: **UnionCnt** and **IntersectCnt.**
 
 |                                                                                                                                                                                                                                                                                                                                                              |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Example:**Board 1 (P)  	  Board 2 (Q)In the above example, as shown with the matching colours, these match:- Row 6 in Board 1 with Row 4 in Board 2 - Column 2 in Board 1 with Column 4 in Board 2 - Column 11 in Board 1 with Column 5 in Board 2 - All empty rows/columnsJaccard_Rows = 2/12 = 1/6Jaccard_Cols = 3/19BaseExactSim = 1/6 + 3/19 = 0.32456 |
+| 
+Example: Board 1 ( P ) <br/>![](https://i.imgur.com/2qeS11n.png)
+<br/>
+Board 2 (Q) <br/>![](https://i.imgur.com/UKaXv6d.png)
+<br/>
+In the above example, as shown with the matching colours, these match:</br>- Row 6 in Board 1 with Row 4 in Board 2 </br>- Column 2 in Board 1 with Column 4 in Board 2 </br>- Column 11 in Board 1 with Column 5 in Board 2 </br>- All empty rows/columns</br>Jaccard_Rows = 2/12 = 1/6</br>Jaccard_Cols = 3/19</br>BaseExactSim = 1/6 + 3/19 = 0.32456 
+|
 
   
 
@@ -663,21 +673,18 @@ The Jaccard Value can be calculated using: **UnionCnt** and **IntersectCnt.**
 
 - Total number of rows in each state = _N_
 - Hashing each row will require iterating through each row element (i.e. number of columns), therefore _O(N)_
-- Therefore, time-complexity of creating the extendible hashing data structure = _O(N__<sup>2</sup>__)_
+- Therefore, time-complexity of creating the extendible hashing data structure = $O(N^2)$
 
 
-## * * *
-
-
-##### Part 3: Defining alternate states of a state of the game
+#### Part 3: Defining alternate states of a state of the game
 
 - Let Variations(S<sub>G,i</sub>) = set of states = {S<sup>90</sup><sub>G, i</sub> ,S<sup>180</sup><sub>G, i</sub> , S<sup>270</sup><sub>G, i</sub> , S<sup>V</sup><sub>G, i</sub> ,S<sup>H</sup><sub>G, i</sub> , S<sup>D1</sup><sub>G, i</sub> , S<sup>D2</sup><sub>G, i</sub>}
-- Then, let us define ** ****Alts(S****<sub>G,i</sub>****)** = Variations(S<sub>G,i</sub>) U Variations(S**<sup>#</sup>**<sub>G,i</sub>)
+- Then, let us define **Alts(S<sub>G,i</sub>)** = Variations(S<sub>G,i</sub>) U Variations(S<sup>#</sup><sub>G,i</sub>)
 
 * * *
 
 
-##### Part 4: Pruning the search space for shortlisting candidates at move “i”:
+#### Part 4: Pruning the search space for shortlisting candidates at move “i”:
 
 - Recapping from our previous submission, for a game “G”, with TotMoves total moves, we were storing checkpoints of the game state after every √TotMoves. This helped us to retrieve the state of the game at any move “i” in O(√TotMoves) \[how ?: explained in previous submission]
 
@@ -708,7 +715,7 @@ The Jaccard Value can be calculated using: **UnionCnt** and **IntersectCnt.**
 
 - For **EACH** move IDs “M” in {0, √TotMoves,  2 \* √TotMoves, …, √TotMoves x √TotMoves }, 
 
-  - create a voronoi based index (as in part 0) using flattened vectors of {S<sub>G1,M , </sub>…, S<sub>GTotGames,M </sub>} **and their variations ****Alts(S****<sub>G,i</sub>****)** \[as described in Section 3] in with total “TotGames” vectors with “N x N” dimensions each with each vector element being: 
+  - create a voronoi based index (as in part 0) using flattened vectors of {S<sub>G1,M , </sub>…, S<sub>GTotGames,M </sub>} and their variations Alts(S<sub>G,i</sub>) \[as described in Section 3] in with total “TotGames” vectors with “N x N” dimensions each with each vector element being: 
 
     - 0 if white
     - 1 if black
@@ -738,14 +745,14 @@ The Jaccard Value can be calculated using: **UnionCnt** and **IntersectCnt.**
 
   - NOTE: these filtered neighbours, include all variations of a board: ie rotations, ,flips etc.
 
-- Now, for each of these “Intermediate_K” neighbours, find the similarity using one of the COMPUTATIONALLY COSTLY choices of: **BaseExactSim(**P, Q**) **described in Part 2.
+- Now, for each of these “Intermediate_K” neighbours, find the similarity using one of the COMPUTATIONALLY COSTLY choices of: **BaseExactSim(P, Q)** described in Part 2.
 
   - **Stats:**
 
     - Block accesses:
 
       - T1: O(N^2/p) for calculating similarity of S<sub>G,i </sub>with a candidate \[refer to previous submission for “p”]
-      - **Total: **T1 x (number of intermediate neighbours)
+      - **Total:** T1 x (number of intermediate neighbours)
 
   - Among these “Intermediate_K” neighbours, **choose the final K nearest** boards using after sorting per “BaseExactSim(S<sub>G,i</sub>, Neighbour N)”.
 
@@ -760,7 +767,8 @@ For the rest of the assignment, let us consider that the player is making querie
 
 |                                                                                                                                                                                                                                                                                                                                                                                        |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Preserving previous Page Design: **We’ll be keeping our page design as proposed in the previous part as it is, i.e. we will be keeping: “storage based page design” and “update based page design” as it is.**Adding new page designs: **Other than that, we’ll be storing some extra pages for each game to optimise the new queries. The details for the new page design is below: |
+| **Preserving previous Page Design:** We’ll be keeping our page design as proposed in the previous part as it is, i.e. we will be keeping: “storage based page design” and “update based page design” as it is.
+**Adding new page designs:** Other than that, we’ll be storing some extra pages for each game to optimise the new queries. The details for the new page design is below: |
 
   
 
@@ -776,15 +784,15 @@ We have two options for storing number of flips at each checkpoint:
 
 Considering the size of the board we’re considering (i.e. of the order 1000 X 1000), and the nature of the game, there will be many cells that won’t change much after every checkpoint.
 
-**So, at one checkpoint we’ll store, let’s say, 1000 flips and now even if there is no change we’ll keep storing 1000 (or 100x if let’s say there are &lt;= 9 flips). This results in storing unnecessarily high numbers, that too, for each cell, whereas in the 2****<sup>nd</sup>**** approach, we can store smaller numbers (1 digit in case of the example).**
+**So, at one checkpoint we’ll store, let’s say, 1000 flips and now even if there is no change we’ll keep storing 1000 (or 100x if let’s say there are &lt;= 9 flips). This results in storing unnecessarily high numbers, that too, for each cell, whereas in the 2<sup>nd</sup> approach, we can store smaller numbers (1 digit in case of the example).**
 
 Now let’s discuss exactly how we’ll put the data in page design.
 
-Since at each checkpoint we choose to store only the number of flips that happened after the previous checkpoint, the **maximum number will be ****_√TotMoves_**_, _which is roughly 1000.
+Since at each checkpoint we choose to store only the number of flips that happened after the previous checkpoint, the **maximum number will be _√TotMoves_**_, _which is roughly 1000.
 
 Storing an integer requires 4 bytes (or 32 bits), whereas we only need at maximum **10 bits** (2<sup>10</sup> = 1024 > 1000). Therefore, we assign each number of flips a fixed size of 10 bits. These bit strings can then be taken into sets of 8 bits and converted to character for storage (as we did with storing the moves in our original page design, in previous assignment).
 
-Let’s say the page size allows storing _p__<sup>2</sup>_ such flip numbers (or in other words, we can store _10p__<sup>2</sup>_ bits in a page). Then we’ll divide the whole board into subgrids of size **_ceil(N/p) _****X ****_ceil(N/p)_**, allowing each sub-grid to be of a size that we can fit in a single page.
+Let’s say the page size allows storing _p__<sup>2</sup>_ such flip numbers (or in other words, we can store _10p__<sup>2</sup>_ bits in a page). Then we’ll divide the whole board into subgrids of size **_ceil(N/p) _X _ceil(N/p)_**, allowing each sub-grid to be of a size that we can fit in a single page.
 
 **To optimise some queries (discussed later in the Queries section) even more, we’ll be storing the total number of flips for each position throughout the game as well.**
 
@@ -796,18 +804,18 @@ For the sake of example, let’s take a board of size 6X6, which will store chec
 
 The game proceeds as follows:
 
-1. ![](https://lh6.googleusercontent.com/NAsRVFN9Uz9popexQVjGyNKIlqfxxaWdXi_v3P5SNxK8Dom27W1sXwulFnyGt0YIuz1uWK5xZagOi9Gp-RmHDH30ex67-IpOFPb9KvSno0rzuenA4xji1CuIJIxWNKytF5jzsGg295-TMVmkgb2r2pF1xL2XEjf-jwdek9-QxV-K0h0xVCDNTFjPf5JvrQ) 
-2. ![](https://lh6.googleusercontent.com/scMVURoVEl54IHCo_upyQHVCt-JGwZ4Nl9Wfs0mp_SGebNRQLB4CI-HJ_-TC8n2ZzrvyDUX4NoZbQ76X1NWAdqLlGATdWsYvAeVKPrGV3Zt-3CK-0StysQ33Z2wLczx2IffZ5fnJZcZtoX1FfgkKeQjlndf30p-l4O_PNBBhO376toh-NXo4U4QhGcdy0g) 
-3. ![](https://lh6.googleusercontent.com/_aq_veJuhEFCdM_V1pkUhy7_s7PrtrYy_tK3j3OodhGwtZYLgyKBenOoLo6CnmPukwAf5Hd__K1B7Zqc86AfLjGLIFm9Gx2J6NZsyIvWjBlLi8dFCbKaj4hlEbCvF6czGCZJjTuHp54Gq88UshIxzWtW3ndPhfC3yV38Xr7Su57I_eEQwIBr7ILCi0NQtA) 
-4. ![](https://lh3.googleusercontent.com/7ew5B9Ls4xtKuPQizMLAAON-m-5vD6eUzbMalPMz0HgE3wYS2MrofTSwWJ-19wc0HEu2ebIKsAXOjJBAkjoUdXZuUaentlN1lNRIRPxNkmhUd1tdfrIIthmJB_hCAR4HAuIxbgoIGKn5EEXxdhsLOsv4t26m7xSI60QupwxV2V2Qo59Vac2l5lwsak2w9g) 
-5. ![](https://lh3.googleusercontent.com/iN7NPAdDwO7tH5383rPLeDRJ0kDVbQplVBGDW1qiGUuUzpIkizhWwbwBcybMkfNPHOvujaXydwywcdrO6y2557DA71dX6yxJTwTL2DoSIA19O4WzVfrhUGwpOsPUG8yc-FJ-dIvIt08I4Ga2CtKPHLHmksMS5xeWMnk8kwOP_uruASKoXgYd0AJQMduXYg) 
-6. ![](https://lh3.googleusercontent.com/WK3tqDyOqPP49KrgSC4J45-qqUt7hFmbu9lS5hwwazo_PAtwEDeBYMOSlAGR8hSRAyn6lG8zHnpmCsqnZwsT2HhLDoC0ah2cnVXvXUoPanRW2z1_EU7RBpmZb5N99ADoI-OA3lzy2REjgDGhNbOASZhzFgVVIdu-T07vRC1UlvBME2AxkO5oCYLlW8Rbgw) **CHECKPOINT**
-7. ![](https://lh5.googleusercontent.com/iu76IVGR8IbexQbl7HubYVsgOggG_HFNhpD1o0Q02pdkSGc5GxgiTHcMMwEz7kJsw2zZx5kneg03RgzutpXxh5t7YfcacKpcvFe6WMuo515yx6bpa9znR6mAnN-FGzqbHnySNGEHLZbIETOPgbkkW_bECjPAgBhv56EnUm1Nw0Xg9mImr-5SUqFcpN8m5A) 
-8. ![](https://lh3.googleusercontent.com/etrDDn5hzx3KVOyX19hRBcdfRosbfZxr2T_nd3dx2z9L5652rg-6Hxfq_OWX2gPRstHYsPuUaWN16vKGeWEkOJfteSw3aBCF8dzzwdwj5ViUf2xgbfyVwhhoXGWt0DCmk_KIEx69GURw1fL_3SrF_KyVVq0wuT-d6EkDU7f4FcGzSgGcfCFY_XT6R7H5yg) 
-9. ![](https://lh5.googleusercontent.com/HZPWmnV90tZhzLT0f9pBAS1WyejppM6eaVCM-Cn_EVS42_U1WUZhVNo294vK3NHxWOadalvPex5s_oH6zib6dlbay7GdU_l0QQMcbXYL1x1n7jFtpfCuxXZMF0WRBiGYV1dYX3n8P0E5nSge8wwGTwxtQ_F13VPyHzcsUrg65eWtQiEZiCGKfBo3PTkxgg)
-10. ![](https://lh4.googleusercontent.com/wmSpRd6XTplu4YHa5LAwvX1xHJoLQxV7hpChCVTM0lYZTlMvSYxEW3B0ySZO9-yeqT55kNAk8v90lsYVIuaKx6sDxePmyn0TwoKf-ys6M4Dwsmj2Glopajy-F26njqGfF1G6xTIU2sY-BAUXxak19ik6VscOnNqIgVPDiP56MZs1ULCpt-QTts6rS4kaSA)
-11. ![](https://lh4.googleusercontent.com/EHqqknwh6LK_nwYbKAQGi4pP2ZkO0X5SgLgBXaOhoOU1HE8Kz-5cdXeRKo3yoCv8kK2-zmYJWorbJ65eqEmaLvrGG4ukrzrSl7AJ0zm_OzDLn6X_RJzYKbuDEkOUPXyVZMvWifhAtW3CkjLpDrWOyBaMkoxDWXaIIgs2d7wC6fXGAT_at3y5FBG-V600cg) 
-12. ![](https://lh3.googleusercontent.com/qJk_cRW-ceQ4qZSKdffCiydJ58B060pEcmhLRzuTHS1-U-5Tr6I_5e4sfwlICXd-peoq2sYALqhLDpmRnQcVlbj5nhHS3HXBdipma1KvqwlG-l1OFTxd44e1Lj_asVzIqRs3yQ3nikcFyRbTWb7vjbkl_hZWhxAbmlyuCTzjyLCCG_HQNdnZiXdGT_y5BA) **CHECKPOINT**
+1. <img src="https://lh6.googleusercontent.com/NAsRVFN9Uz9popexQVjGyNKIlqfxxaWdXi_v3P5SNxK8Dom27W1sXwulFnyGt0YIuz1uWK5xZagOi9Gp-RmHDH30ex67-IpOFPb9KvSno0rzuenA4xji1CuIJIxWNKytF5jzsGg295-TMVmkgb2r2pF1xL2XEjf-jwdek9-QxV-K0h0xVCDNTFjPf5JvrQ" width="200" height="200"/> 
+2. <img src="https://lh6.googleusercontent.com/scMVURoVEl54IHCo_upyQHVCt-JGwZ4Nl9Wfs0mp_SGebNRQLB4CI-HJ_-TC8n2ZzrvyDUX4NoZbQ76X1NWAdqLlGATdWsYvAeVKPrGV3Zt-3CK-0StysQ33Z2wLczx2IffZ5fnJZcZtoX1FfgkKeQjlndf30p-l4O_PNBBhO376toh-NXo4U4QhGcdy0g" width="200" height="200"/> 
+3. <img src="https://lh6.googleusercontent.com/_aq_veJuhEFCdM_V1pkUhy7_s7PrtrYy_tK3j3OodhGwtZYLgyKBenOoLo6CnmPukwAf5Hd__K1B7Zqc86AfLjGLIFm9Gx2J6NZsyIvWjBlLi8dFCbKaj4hlEbCvF6czGCZJjTuHp54Gq88UshIxzWtW3ndPhfC3yV38Xr7Su57I_eEQwIBr7ILCi0NQtA" width="200" height="200"/> 
+4. <img src="https://lh3.googleusercontent.com/7ew5B9Ls4xtKuPQizMLAAON-m-5vD6eUzbMalPMz0HgE3wYS2MrofTSwWJ-19wc0HEu2ebIKsAXOjJBAkjoUdXZuUaentlN1lNRIRPxNkmhUd1tdfrIIthmJB_hCAR4HAuIxbgoIGKn5EEXxdhsLOsv4t26m7xSI60QupwxV2V2Qo59Vac2l5lwsak2w9g" width="200" height="200"/> 
+5. <img src="https://lh3.googleusercontent.com/iN7NPAdDwO7tH5383rPLeDRJ0kDVbQplVBGDW1qiGUuUzpIkizhWwbwBcybMkfNPHOvujaXydwywcdrO6y2557DA71dX6yxJTwTL2DoSIA19O4WzVfrhUGwpOsPUG8yc-FJ-dIvIt08I4Ga2CtKPHLHmksMS5xeWMnk8kwOP_uruASKoXgYd0AJQMduXYg" width="200" height="200"/> 
+6. <img src="https://lh3.googleusercontent.com/WK3tqDyOqPP49KrgSC4J45-qqUt7hFmbu9lS5hwwazo_PAtwEDeBYMOSlAGR8hSRAyn6lG8zHnpmCsqnZwsT2HhLDoC0ah2cnVXvXUoPanRW2z1_EU7RBpmZb5N99ADoI-OA3lzy2REjgDGhNbOASZhzFgVVIdu-T07vRC1UlvBME2AxkO5oCYLlW8Rbgw" width="200" height="200"/> **CHECKPOINT**
+7. <img src="https://lh5.googleusercontent.com/iu76IVGR8IbexQbl7HubYVsgOggG_HFNhpD1o0Q02pdkSGc5GxgiTHcMMwEz7kJsw2zZx5kneg03RgzutpXxh5t7YfcacKpcvFe6WMuo515yx6bpa9znR6mAnN-FGzqbHnySNGEHLZbIETOPgbkkW_bECjPAgBhv56EnUm1Nw0Xg9mImr-5SUqFcpN8m5A" width="200" height="200"/> 
+8. <img src="https://lh3.googleusercontent.com/etrDDn5hzx3KVOyX19hRBcdfRosbfZxr2T_nd3dx2z9L5652rg-6Hxfq_OWX2gPRstHYsPuUaWN16vKGeWEkOJfteSw3aBCF8dzzwdwj5ViUf2xgbfyVwhhoXGWt0DCmk_KIEx69GURw1fL_3SrF_KyVVq0wuT-d6EkDU7f4FcGzSgGcfCFY_XT6R7H5yg" width="200" height="200"/> 
+9. <img src="https://lh5.googleusercontent.com/HZPWmnV90tZhzLT0f9pBAS1WyejppM6eaVCM-Cn_EVS42_U1WUZhVNo294vK3NHxWOadalvPex5s_oH6zib6dlbay7GdU_l0QQMcbXYL1x1n7jFtpfCuxXZMF0WRBiGYV1dYX3n8P0E5nSge8wwGTwxtQ_F13VPyHzcsUrg65eWtQiEZiCGKfBo3PTkxgg" width="200" height="200"/>
+10. <img src="https://lh4.googleusercontent.com/wmSpRd6XTplu4YHa5LAwvX1xHJoLQxV7hpChCVTM0lYZTlMvSYxEW3B0ySZO9-yeqT55kNAk8v90lsYVIuaKx6sDxePmyn0TwoKf-ys6M4Dwsmj2Glopajy-F26njqGfF1G6xTIU2sY-BAUXxak19ik6VscOnNqIgVPDiP56MZs1ULCpt-QTts6rS4kaSA" width="200" height="200"/>
+11. <img src="https://lh4.googleusercontent.com/EHqqknwh6LK_nwYbKAQGi4pP2ZkO0X5SgLgBXaOhoOU1HE8Kz-5cdXeRKo3yoCv8kK2-zmYJWorbJ65eqEmaLvrGG4ukrzrSl7AJ0zm_OzDLn6X_RJzYKbuDEkOUPXyVZMvWifhAtW3CkjLpDrWOyBaMkoxDWXaIIgs2d7wC6fXGAT_at3y5FBG-V600cg" width="200" height="200"/> 
+12. <img src="https://lh3.googleusercontent.com/qJk_cRW-ceQ4qZSKdffCiydJ58B060pEcmhLRzuTHS1-U-5Tr6I_5e4sfwlICXd-peoq2sYALqhLDpmRnQcVlbj5nhHS3HXBdipma1KvqwlG-l1OFTxd44e1Lj_asVzIqRs3yQ3nikcFyRbTWb7vjbkl_hZWhxAbmlyuCTzjyLCCG_HQNdnZiXdGT_y5BA" width="200" height="200"/> **CHECKPOINT**
 
 For the sake of simplicity, we don’t show moves after 12.
 
@@ -852,13 +860,13 @@ Similarly we can find the flips for each cell at checkpoint 2 (after move 12) as
 
 4. There will be some boards saying that the given position will flip, and some will say not flipped, to decide the result **take majority**.
 
-   - In case there is a tie (will only happen when _K_ is even), **we’ll be pessimistic** and declare not flipped.
+   - In case there is a tie (will only happen when $K$ is even), **we’ll be pessimistic** and declare not flipped.
 
 Time complexity (excluding the time taken to find KNB):
 
-- For each board, going to next step will take _O(N__<sup>2</sup>__) _to simulate that move
-- Total boards: number of nearest neighbours = _K_
-- Therefore, time complexity = _O(KN__<sup>2</sup>__)_
+- For each board, going to next step will take $O(N^2)$ to simulate that move
+- Total boards: number of nearest neighbours = $K$
+- Therefore, time complexity = $O(K \times N^2)$
 
 
 ##### Solving (b)
@@ -867,16 +875,16 @@ In the proposed page design, at each checkpoint, for each cell we store the numb
 
 1. Do steps 2 to 4 for each of the KNB:
 2. We’ll loop over all the checkpoints to find the first next checkpoint which has non-zero flips for position _(i,j)_.
-3. If, let’s say, checkpoint _p__<sub>i</sub>_<sub> </sub>has non-zero flips, then find the first move between _p__<sub>i-1</sub>_<sub> </sub>and _p__<sub>i </sub>_where the flip happened.
-4. Now, the number of moves with no flips is all the moves between current move and _p__<sub>i </sub>_+ moves between _p__<sub>i </sub>_and _p__<sub>i+1 </sub>_with no flips.
+3. If, let’s say, checkpoint _p_<sub>i</sub>_<sub> </sub>has non-zero flips, then find the first move between _p_<sub>i-1</sub>_<sub> </sub>and _p_<sub>i </sub> where the flip happened.
+4. Now, the number of moves with no flips is all the moves between current move and _p_<sub>i </sub>_+_ moves between _p_<sub>i </sub> and _p_ _<sub>i+1 </sub>_ with no flips.
 5. To guarantee no flips, **we’ll be pessimistic and take the minimum of the results** given across all KNB.
 
 Time complexity (excluding the time taken to find KNB):
 
 - For each board _O(√TotMoves)_ will be required to find the required checkpoint and then loop after that checkpoint to find the required move.
-- In each iteration of loop (mentioned above), _O(N__<sup>2</sup>__) _will be required to simulate that move.
+- In each iteration of loop (mentioned above), _O(N_<sup>2</sup>_)_ will be required to simulate that move.
 - This will be done for _K_ boards.
-- Therefore, time complexity = _O(K N__<sup>2</sup>__ √TotMoves)_
+- Therefore, time complexity = _O(K N_<sup>2</sup> _√TotMoves)_
 
 **Alternate Approach**
 
@@ -896,9 +904,9 @@ This part is an enhanced version of part (a).
 
 Time complexity (after finding KNB):
 
-- For each board, going to next step will take _O(N__<sup>2</sup>__) _to simulate that move
+- For each board, going to next step will take _O(N_<sup>2</sup>_)_ to simulate that move
 - Total boards: _K_
-- Therefore, time complexity = _O(KN__<sup>2</sup>__)_
+- Therefore, time complexity = _O(KN_<sup>2</sup>_)_
 
 * * *
 
@@ -937,9 +945,9 @@ For the sake of simple explanation, we also assume that returning all means thro
 Time complexity (after finding KNB):
 
 - Looping over moves will require _O(TotMoves)_
-- For each such move, simulating next two moves will require _O(N__<sup>2</sup>__)_
+- For each such move, simulating next two moves will require _O(N_<sup>2</sup>_)_
 - This needs to be done for _K_ boards
-- Therefore, time complexity = _O(K N__<sup>2</sup>__ TotMoves)_
+- Therefore, time complexity = _O(K N_<sup>2</sup> _TotMoves)_
 
 
 ##### Solving (b)
@@ -988,9 +996,9 @@ In the proposed page design, we’re storing the total number of flips for each 
 
 Time complexity (after finding KNB):
 
-- For each board, we need to get total number of flips for each cell which will require _O(N__<sup>2</sup>__)_
+- For each board, we need to get total number of flips for each cell which will require _O(N_<sup>2</sup>_)_
 - This needs to be done for _K_ boards
-- Therefore, time-complexity = _O(K N__<sup>2</sup>__)_
+- Therefore, time-complexity = _O(K N_<sup>2</sup>_)_
 
 * * *
 
@@ -1017,9 +1025,9 @@ This case boils down to a slightly different version of Query 3.
 
 Time complexity (after finding KNB):
 
-- For each board, we need to get total number of flips for each cell which will require _O(N__<sup>2</sup>__)_
+- For each board, we need to get total number of flips for each cell which will require _O(N_<sup>2</sup>_)_
 - This needs to be done for _K_ boards
-- Therefore, time-complexity = _O(K N__<sup>2</sup>__)_
+- Therefore, time-complexity = _O(K N_<sup>2</sup>_)_
 
 **Case 2: Forever means from this (or the very next) move to the end**
 
@@ -1031,14 +1039,14 @@ Time complexity (after finding KNB):
 
 Time complexity (after finding KNB):
 
-- For finding the number of flips in all future checkpoints, _O(√TotMoves)_ will be required, and _O(N__<sup>2</sup>__ √TotMoves) _for simulating moves and finding flips in the current checkpoint.
+- For finding the number of flips in all future checkpoints, _O(√TotMoves)_ will be required, and _O(N_<sup>2</sup> _√TotMoves)_ for simulating moves and finding flips in the current checkpoint.
 - This needs to be done for _K_ boards
-- Therefore, time-complexity = _O(K N__<sup>2</sup>__ √TotMoves)_
+- Therefore, time-complexity = _O(K N_<sup>2</sup> _√TotMoves)_
 
 * * *
 
 
-###### OPEN ENDED queries 
+### OPEN ENDED queries 
 
 
 #### Other Query 1: Check if the current state is deterministic and the winning player is already decided
@@ -1051,22 +1059,22 @@ Time complexity (after finding KNB):
 
 Time complexity (after finding KNB):
 
-- To check the winning player of each board, _O(N__<sup>2</sup>__) _will be required.
+- To check the winning player of each board, _O(N_<sup>2</sup>_)_ will be required.
 - This needs to be done for _K_ boards.
-- Therefore, time-complexity = _O(K N__<sup>2</sup>__)_
+- Therefore, time-complexity = _O(K N_<sup>2</sup>_)_
 
 
 #### Other Query 2: Check the maximum flips possible in the next move according to KNB. This will allow the player to aim somewhere near that value while taking a move.
 
 1. Find KNB according to the current state of the game.
 2. Proceed each board to the next move and find the number of flips.
-3. Return the maximum number of flips possible over all the _K _boards.
+3. Return the maximum number of flips possible over all the _K_ boards.
 
 Time complexity (after finding KNB):
 
-- To proceed to the next move and find the number of flips _O(N__<sup>2</sup>__) _will be required.
-- This needs to be done for _K_ boards.
-- Therefore, time-complexity = _O(K N__<sup>2</sup>__)_
+- To proceed to the next move and find the number of flips _O(N_<sup>2</sup>_)_ will be required.
+- This needs to be done for $K$ boards.
+- Therefore, time-complexity = _O(K N_<sup>2</sup>_)_
 
 **KEY TAKEAWAYS**
 
@@ -1074,7 +1082,7 @@ Time complexity (after finding KNB):
 
 - Query optimization, index optimization, and schema optimization go hand in hand.
 
-- For query execution, though we did not have any logical AND\\OR operations, in order for efficiently executing the** “K Nearest Neighbours”** query, we effectively use several optimizations like:
+- For query execution, though we did not have any logical AND\\OR operations, in order for efficiently executing the **“K Nearest Neighbours”** query, we effectively use several optimizations like:
 
   - **Secondary index** for Voronoi Tessellation in Part 0
   - **Extendible hashing** for our Jaccard based similarity metric
