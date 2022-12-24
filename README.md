@@ -560,16 +560,11 @@ The metric should show high similarity for S<sub>G, i</sub> with S<sub>G, i</sub
 | --------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Operation performed**     | **Notation to depict the board state after the performed operation** | **Board state  after operation performed**                                                                                                                                                                                                |
 | Original Board              | S<sub>G, i</sub>                                                     | **<img src="https://lh5.googleusercontent.com/MWWyMx0tg1O3sj21aJztoxlOzOxc___sVHLtOBz-0ioOqF24V5uDLdIQlxtirpAAGwE1zH4hBm3V7Wp7HrjpT9msomXlJp6AOniYleLryqbmNrxB1CFDM_9J2uwnvlFuVGZTO7d73WuEAc72R1sg0FiI1ZJZ9llbzERIVb-4Z7v2PZUykNmmAnZA6oiUcA" width="200" height="200"/>** |
-| Rotation by 90 degrees      | S<sup>90</sup><sub>G, i</sub>                                        |   <img src="https://i.imgur.com/fuB5pF8.png" width="200" height="200"/>
-   |
-| Rotation by 180 degrees     | S<sup>180</sup><sub>G, i</sub>                                       |  <img src="https://i.imgur.com/fA2Vot6.png" width="200" height="200"/>
-   |
-| Rotation by 270 degrees     | S<sup>270</sup><sub>G, i</sub>                                       |  <img src="https://i.imgur.com/gIv4hEr.png" width="200" height="200"/>
-   |
-| Horizontally flipped        | S<sup>H</sup><sub>G, i</sub>                                         |  <img src="https://i.imgur.com/2i1AIKI.png" width="200" height="200"/>
- |
-| Vertically flipped          | S<sup>V</sup><sub>G, i</sub>                                         |  <img src="https://i.imgur.com/ldMp6E4.png" width="200" height="200"/>
-  |
+| Rotation by 90 degrees      | S<sup>90</sup><sub>G, i</sub>                                        |   <img src="https://i.imgur.com/fuB5pF8.png" width="200" height="200"/>   |
+| Rotation by 180 degrees     | S<sup>180</sup><sub>G, i</sub>                                       |  <img src="https://i.imgur.com/fA2Vot6.png" width="200" height="200"/>|
+| Rotation by 270 degrees     | S<sup>270</sup><sub>G, i</sub>                                       |  <img src="https://i.imgur.com/gIv4hEr.png" width="200" height="200"/>|
+| Horizontally flipped        | S<sup>H</sup><sub>G, i</sub>                                         |  <img src="https://i.imgur.com/2i1AIKI.png" width="200" height="200"/>|
+| Vertically flipped          | S<sup>V</sup><sub>G, i</sub>                                         |  <img src="https://i.imgur.com/ldMp6E4.png" width="200" height="200"/>|
 | Flipped across diagonal 1   | S<sup>D1</sup><sub>G, i</sub>                                        | <img src="https://lh6.googleusercontent.com/qf0ZfqBIZwdyvC8XS6nHFRIvUyy3LrpSJyeU7zCa4V5zqzYy-_OF5qe2fffQvLWJU3WZVxRme0O3HnMLkvXlkxK_ixgV4cMaTN2WEd65lhxyMBz0SGFmbIzq8A-JdjGiJr2pZTSamkNzS3iQ037fp5VGLnBSDsyeDDDFvfKDiytTgtOZKQ8mHMaovzROMw" width="200" height="200"/>     |
 | Flipped across diagonal 2   | S<sup>D2</sup><sub>G, i</sub>                                        | <img src="https://lh3.googleusercontent.com/qPxaW8wXWLN4_kPjUe2nDofsrj9-3PKwlRh-BVe7mzsyUMQT8osCH6Sn-5JpfYN_xFC-Yo_PWoVwrwkd-8sj3QHfDWYOslOpnEHxWJmJpMBYsMMlekM3dCxwwswuGawzvECjIPMxIkL3Awg2_iEHggXsCVxXeXeyxhTBqMTyJn-sgLX3mFPzPg6F2coVpQ" width="200" height="200"/>     |
 | Each cell’s colour inverted | S<sup>#</sup><sub>G, i</sub>                                         | <img src="https://lh4.googleusercontent.com/DW0PHv6NPtMCLBNrLY573Jap-jVfBMgMX-LHW9qz1Ozs8MeY3C65BVMvKnDm0zIv4J403Wrrk9iw5HD8_foFsrk5MqCbj8u1Zm2cUvdT5s_oHi94FdorbTa1tU9q-4cqxogLk_JuvWRoLHfAc9KtbOOrCeNKEY_PggAeIO5ixBa2bkqWgRjUY0WkNr15Eg" width="200" height="200"/>     |
