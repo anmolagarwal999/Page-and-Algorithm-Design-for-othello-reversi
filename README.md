@@ -1,10 +1,15 @@
-**Page Design for storing Played Games for Reversi/Othello with efficient navigation queries**
+## Page Design for storing Played Games for Reversi/Othello with efficient navigation queries
 
 - Anmol Agarwal (2019101068), Sanchit Arora (2019101047)
 
-**Game rules****: **<https://en.wikipedia.org/wiki/Reversi> 
+### Aim:
+* Design the page layout to store the board position of the game under the constraint that it should be possible to efficiently replay the complete game, or check what the board position at some move is.
+* Augmenting the page design to perform `what if` analysis when different moves are made at the current state of the game. This includes: Finding the K nearest board configurations from the past history of the game and then using these retrieved neighbours for calculate the goodness of specific moves heuristically.
 
-**Some rules** **&** **board invariants** **worth highlighting for the purpose of our design:**
+
+**Game rules**: <https://en.wikipedia.org/wiki/Reversi>
+
+#### Some rules & board invariants worth highlighting for the purpose of our design
 
 - **A1:** Different sources mention different criteria for ending of the game when a player cannot move. Some sources say that the game ends when either player cannot move. Others say that the game ends only when BOTH players are not able to move.
 
@@ -14,7 +19,7 @@
 
 - **A3:** In each move, exactly one disk is added to the board i.e. the number of disks on the board is the same as the number of moves done on the board so far.
 
-**Some terminology/notation:**
+#### Some terminology/notation:
 
 - **N** = side of the board => N x N = number of cells on the board | N&lt;=1e3
 - For ease of reference, without loss of generality, we consider the initial configuration of the board played i.e. having 4 disks as the first four moves. Hence, MAX MOVES in our case: N x N (since we are considering the initial configuration of the game to consume 4 moves)
@@ -24,7 +29,7 @@
 - **S****<sub>i</sub>** = state of the board after Move “i”
 
 
-## Queries we are prioritizing:
+#### Queries we are prioritizing:
 
 There were many page designs in our minds which could have been optimized for different queries for the game. While presenting our below design, we consider the below to be our topmost priority:
 
@@ -37,7 +42,7 @@ There were many page designs in our minds which could have been optimized for di
   - Eg: instead of starting from state 1, the user can directly ask to view the state of the game after 4500 moves. After that, he/she can ask to **directly** move to the state of the game after move 11005 without transitioning through all the states from **move 4500 to 11004**.
 
 
-### How a state change might be implemented in a OTHELLO GAME:
+#### How a state change might be implemented in a OTHELLO GAME:
 
 - LET US ASSUME ONLY for an instant (and NOT for the remaining part of this document) that we are able to load the entire game into memory into a matrix ARR where ARR\[i]\[j] is:
 
@@ -74,7 +79,7 @@ While brainstorming, in our shortlisted page designs, we often found a tradeoff 
   - ****
 
 
-## Making navigation queries efficient by using SQUARE-root decomposition type logicProposal:
+### Making navigation queries efficient by using SQUARE-root decomposition type logicProposal:
 
 Let us assume that game “G” has “TotMoves” total moves. Then, we store the snapshot (checkpoint) of the board (using page design 1) for every Kth state where K = sqrt(TotMoves).
 
@@ -119,7 +124,7 @@ Then we will be taking a snapshot after every K moves where K = sqrt(TotMoves).
   -  In the worst case, diff can be nearly N^2 and hence, we might end up making (N x sqrt(TotMoves)) operations where TotMoves can be atmax N^2 and so, in worst case, we would end up making **N^2 operations** which is an improvement by a factor of “N” (ie an improvement by a factor of 1000 potentially for large board sized games).
 
 
-## Page Design 1 (Storage based Page)
+#### Page Design 1 (Storage based Page)
 
 We propose to use this page design for storing the checkpoints of the board state every sqrt(TotMoves) moves as described above. These pages will only be READ-ONLY in nature.
 
@@ -130,7 +135,7 @@ Consider that we need to store the following state of the 12 x 12 board:
 ![](https://lh6.googleusercontent.com/q0h8-9xhLMUxuCDsjfnESlOLLotT5vk48bjLqJTFhhfpKUbRQuPebiVi7RvClPPs0PeJ_22WywHO1EnbWoWr_IXdA1A79jGfPuWkVuRL2VapRxfVlRlh_WHYZGoHcTKB8svpOgJ2aF5biNMkd8EGeZRBcKh3qdqxkVzdX5zGF76YaT8sdP6FT5CD8CglAw)
 
 
-### Feature 1: Truncating the board to store only the smallest rectangle which covers the entire connected component
+###### Feature 1: Truncating the board to store only the smallest rectangle which covers the entire connected component
 
 First we make the following claims:
 
@@ -186,7 +191,7 @@ For perspective, for a **1000 x 1000 board** with 1,000,000 cells, 
 Now, let us store the board row-wise ie calculate an encoding for each row.
 
 
-### Suggested encoding 1 for rows: 
+##### Suggested encoding 1 for rows: 
 
 Let us say that we want to encode row 4 of the board.
 
@@ -274,7 +279,7 @@ For ease of reading above, every alternate row’s encoding has been bolded. Als
 * * *
 
 
-## Page Design 2 (Update based Page)
+#### Page Design 2 (Update based Page)
 
 **It is not easy to make updates based on moves in the design used in page design 1**. Hence, we switch to a different page design on which updates will be much easier. 
 
@@ -314,7 +319,7 @@ Let us consider the following **8 x 8** example (and a page size of **9 bytes**)
 ![](https://lh4.googleusercontent.com/VKaCFYM9GPZ_8-aEmNHYCugtkaey3RQJpCR5bTVAUahSfavKsRsFcuzNcfwCVW2IGwO6HWAz9ZhvnMd3ZoOxRthkcgjyUujRIpe9fbIKxjg1M-IPI04MoXJu-B5dRe7dD7m4xOdINcKtzqPSIj7f7LK14m7skhaFFXnbTl9FuKVV96--TLDN2tAoB-Jebw)
 
 
-### Proposed update-based page design 1:
+##### Proposed update-based page design 1:
 
 Flatten the 2D board into a 1D board and store a character “E”,”W” and “B” depending on the state of the cell. Each character occupies one byte. So, if a page can store “T” bytes, then ceil(N<sup>2</sup>/T) pages will be needed.
 
@@ -325,7 +330,7 @@ Flatten the 2D board into a 1D board and store a character “E”,”W” and �
 In the above example, different colors represent the contents of different pages assuming a page size of 9 bytes.
 
 
-### Proposed update-based page design 2 (much improved):
+##### Proposed update-based page design 2 (much improved):
 
 Store a sub-grid in each page. So if, let’s say, the page size allows us to store _p_ elements, we’ll store a grid of _√p X √p_ in each page. Since we have assumed page size to be 9 bytes, p =3 for our example.
 
@@ -359,7 +364,7 @@ So, instead of using an entire character (1 byte)  for each state, we can repre
 This data can simply be treated as bit stream, which can then be encoded into bytes for storage (explained in detail below).
 
 
-## Storing the moves of each game in a new relation
+### Storing the moves of each game in a new relation
 
 Let each game have a GAME ID which is **incremental **in nature. For resolving the state of the board between checkpoints (intermediate states), all moves of the game need to be stored. For this, we maintain a separate table with this page design as explained in “proposed approach”:** Since the player turns are alternative, we need not store the player ID of the player who made the move (**an even move is always by player 1 and odd move is always by player 2**).**
 
@@ -430,7 +435,7 @@ Additional data may be stored per page to store information such as the list of 
 * * *
 
 
-## To store one completed game, how much storage is needed. 
+##### To store one completed game, how much storage is needed. 
 
 I have given stepwise memory consumed by the different steps of the pipeline in respective sections. Recapping:
 
@@ -467,7 +472,7 @@ Therefore, memory needed would be: 
 **Total memory = **sum of all the above terms
 
 
-## Summarizing, 
+### Summarizing, 
 
 **Recapping the various benefits of our design,**
 
@@ -476,9 +481,8 @@ Therefore, memory needed would be: 
 - The usage of page design (#2) for updates makes updates extremely quick. Storing the square submatrices in each page instead of flattening the board grid helps us take advantage of locality of reference during disk-page accesses for all 3 types of updates: row-based, column-based and diagonal based updates. This is especially helpful for Reversi where all updates are on contiguous neighboring cells possible across all 6 directions.
 - Using Huffman encoding based compression for WHITE, BLACK and EMPTY helps us reduce our storage for the state of each board cell by 4 times (from 1 byte to 2 bits).
 
-**Page & Algorithm Design for Query Execution for assisting Reversi/Othello players**
+## Page & Algorithm Design for Query Execution for assisting Reversi/Othello players**
 
-- Anmol Agarwal (2019101068), Sanchit Arora (2019101047)
 
 **Some terminology/notation:**
 
@@ -495,7 +499,7 @@ Therefore, memory needed would be: 
   
 
 
-**Approach to finding K nearest Neighbours and revised page design:**
+### Approach to finding K nearest Neighbours and revised page design:**
 
 **Part 0: Defining a subproblem whose solution helps us solve the later part of the assignment**
 
@@ -545,7 +549,7 @@ O(_dimensions in each vector_ X _number of clusters_ ) +  O(_dimensions in each
 * * *
 
 
-### Part 1: What are the desirable properties our similarity metric should cover ?
+#### Part 1: What are the desirable properties our similarity metric should cover ?
 
 The metric should show high similarity for S<sub>G, i</sub> with S<sub>G, i</sub> itself but also with the below versions of S<sub>G, i</sub> after rotation, flipping, colour inversion etc as can be seen below.
 
@@ -565,10 +569,10 @@ The metric should show high similarity for S<sub>G, i</sub> with S<sub>G, i</sub
 * * *
 
 
-## Part 2: Candidates for base exact similarity metric between 2 given states ie board configuration: P and Q ie BaseExactSim(P, Q)
+#### Part 2: Candidates for base exact similarity metric between 2 given states ie board configuration: P and Q ie BaseExactSim(P, Q)
 
 
-### Choice 1 for “Base Exact Similarity Metric”: Number of unmatching cells needed
+##### Choice 1 for “Base Exact Similarity Metric”: Number of unmatching cells needed
 
 - Given states P and Q (each with N x N elements), when using this metric, we define 
 
@@ -587,7 +591,7 @@ The metric should show high similarity for S<sub>G, i</sub> with S<sub>G, i</sub
 - Therefore, time-complexity = _O(N__<sup>2</sup>__)_
 
 
-### Choice 2 for “Base Exact Similarity Metric”: Jaccard based similarity
+##### Choice 2 for “Base Exact Similarity Metric”: Jaccard based similarity
 
 **Metric proposal**
 
@@ -665,7 +669,7 @@ The Jaccard Value can be calculated using: **UnionCnt** and **IntersectCnt.**
 ## * * *
 
 
-## Part 3: Defining alternate states of a state of the game
+##### Part 3: Defining alternate states of a state of the game
 
 - Let Variations(S<sub>G,i</sub>) = set of states = {S<sup>90</sup><sub>G, i</sub> ,S<sup>180</sup><sub>G, i</sub> , S<sup>270</sup><sub>G, i</sub> , S<sup>V</sup><sub>G, i</sub> ,S<sup>H</sup><sub>G, i</sub> , S<sup>D1</sup><sub>G, i</sub> , S<sup>D2</sup><sub>G, i</sub>}
 - Then, let us define ** ****Alts(S****<sub>G,i</sub>****)** = Variations(S<sub>G,i</sub>) U Variations(S**<sup>#</sup>**<sub>G,i</sub>)
@@ -673,7 +677,7 @@ The Jaccard Value can be calculated using: **UnionCnt** and **IntersectCnt.**
 * * *
 
 
-## Part 4: Pruning the search space for shortlisting candidates at move “i”:
+##### Part 4: Pruning the search space for shortlisting candidates at move “i”:
 
 - Recapping from our previous submission, for a game “G”, with TotMoves total moves, we were storing checkpoints of the game state after every √TotMoves. This helped us to retrieve the state of the game at any move “i” in O(√TotMoves) \[how ?: explained in previous submission]
 
@@ -687,20 +691,20 @@ The Jaccard Value can be calculated using: **UnionCnt** and **IntersectCnt.**
 **Proposed algorithm for finding the K nearest neighbours of the ith state of game G ie ****S****<sub>G,i</sub>**
 
 
-### Inputs:
+#### Inputs:
 
 - Game ID: G
 - State ID: i
 - State of the game: S<sub>G,i</sub>
 
 
-### Some notation:
+#### Some notation:
 
 - TotGames: number of games played in the past
 - N : size of game board
 
 
-### Preprocessing:
+#### Preprocessing:
 
 - For **EACH** move IDs “M” in {0, √TotMoves,  2 \* √TotMoves, …, √TotMoves x √TotMoves }, 
 
@@ -752,7 +756,7 @@ The Jaccard Value can be calculated using: **UnionCnt** and **IntersectCnt.**
 For the rest of the assignment, let us consider that the player is making queries while the game is currently at move “C”.
 
 
-# Part 5: Page Design
+### Part 5: Page Design
 
 |                                                                                                                                                                                                                                                                                                                                                                                        |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -825,14 +829,14 @@ Similarly we can find the flips for each cell at checkpoint 2 (after move 12) as
 * * *
 
 
-## Query 1 \[LONGEVITY]
+#### Query 1 \[LONGEVITY]
 
 |                                                                                                                                                                                                                                                                                                                                                                       |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | You are given a position (i,j) and the move on which you are currently at. Then you need to answer the following: 1. Whether the color at position (i,j) will be flipped in the next move or not. 2. For how many moves you can guarantee that this position will not be flipped. 3. In the next move, all positions in the board that are going to become flippable. |
 
 
-### Solving (a)
+##### Solving (a)
 
 1. We’ll first find KNB using the current state of the game.
 
@@ -857,7 +861,7 @@ Time complexity (excluding the time taken to find KNB):
 - Therefore, time complexity = _O(KN__<sup>2</sup>__)_
 
 
-### Solving (b)
+##### Solving (b)
 
 In the proposed page design, at each checkpoint, for each cell we store the number of times the cell was flipped after the last checkpoint.
 
@@ -881,7 +885,7 @@ Time complexity (excluding the time taken to find KNB):
 - But, finding the exact move within the partition will still take _O(√TotMoves)_, so the worst case in this alternate approach would still be the same as before.
 
 
-### Solving (c)
+##### Solving (c)
 
 This part is an enhanced version of part (a).
 
@@ -899,7 +903,7 @@ Time complexity (after finding KNB):
 * * *
 
 
-## Query 2 \[DIFF IN FLIPS]
+#### Query 2 \[DIFF IN FLIPS]
 
 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -938,7 +942,7 @@ Time complexity (after finding KNB):
 - Therefore, time complexity = _O(K N__<sup>2</sup>__ TotMoves)_
 
 
-### Solving (b)
+##### Solving (b)
 
 This part is an extension of the above part.
 
@@ -964,7 +968,7 @@ This part is an extension of the above part.
 * * *
 
 
-## Query 3 \[MAX FLIPS]
+#### Query 3 \[MAX FLIPS]
 
 |                                                                                                                   |
 | ----------------------------------------------------------------------------------------------------------------- |
@@ -991,7 +995,7 @@ Time complexity (after finding KNB):
 * * *
 
 
-## Query 4
+#### Query 4
 
 |                                                                                                                                                                                                                             |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1034,10 +1038,10 @@ Time complexity (after finding KNB):
 * * *
 
 
-## OPEN ENDED queries 
+###### OPEN ENDED queries 
 
 
-### Other Query 1: Check if the current state is deterministic and the winning player is already decided
+#### Other Query 1: Check if the current state is deterministic and the winning player is already decided
 
 1. Find KNB according to the current state of the game.
 2. Store two counter variables, one for each of the players, both of them initialised to zero.
@@ -1052,7 +1056,7 @@ Time complexity (after finding KNB):
 - Therefore, time-complexity = _O(K N__<sup>2</sup>__)_
 
 
-### Other Query 2: Check the maximum flips possible in the next move according to KNB. This will allow the player to aim somewhere near that value while taking a move.
+#### Other Query 2: Check the maximum flips possible in the next move according to KNB. This will allow the player to aim somewhere near that value while taking a move.
 
 1. Find KNB according to the current state of the game.
 2. Proceed each board to the next move and find the number of flips.
